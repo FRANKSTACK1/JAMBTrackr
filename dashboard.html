@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | JAMB Trackr</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <script>
+        (function() {
+            const session = localStorage.getItem('currentUserEmail');
+            if (!session) window.location.replace('auth.html');
+            if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');
+        })();
+    </script>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><i class="fas fa-graduation-cap"></i> <span>JAMB<span>Trackr</span></span></div>
+            <div class="nav-right">
+                <div class="streak-mini"><i class="fas fa-fire"></i> <span id="streak-val">0</span></div>
+                <div class="user-profile">
+                    <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=00C853&color=fff" alt="User">
+                </div>
+                <div class="hamburger" id="hamburger"><span></span><span></span><span></span></div>
+            </div>
+        </div>
+    </nav>
+
+    <aside class="sidebar" id="sidebar">
+        <ul class="side-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="dashboard.html" class="active"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+            <li><a href="subjects.html"><i class="fas fa-book"></i> Subjects</a></li>
+            <li><a href="novel.html"><i class="fas fa-book"></i> Novel</a></li>
+            <li><a href="progress.html"><i class="fas fa-chart-line"></i> Analytics</a></li>
+            <li><a href="reader.html"><i class="fas fa-file-pdf"></i> Reader</a></li>
+            <li><a href="settings.html"><i class="fas fa-cog"></i> Settings</a></li>
+            <li><a href="logout.html" style="color: #ff5252;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </aside>
+
+    <main class="main-content">
+        <header class="welcome-sec" data-aos="fade-down">
+            <div>
+                <h1 id="welcome-name">Welcome back 👋</h1>
+                <p id="current-date"></p>
+            </div>
+            <div class="quote-box"><p>"Consistency beats intensity."</p></div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="card goal-card" data-aos="fade-up">
+                <h3>Daily Study Goal</h3>
+                <div class="progress-circle-container">
+                    <svg class="progress-ring" width="120" height="120">
+                        <circle class="progress-ring__circle-bg" stroke="#e0e0e0" stroke-width="8" fill="transparent" r="50" cx="60" cy="60"/>
+                        <circle class="progress-ring__circle" id="goal-circle" stroke="#00C853" stroke-width="8" stroke-dasharray="314.15" stroke-dashoffset="314.15" fill="transparent" r="50" cx="60" cy="60"/>
+                    </svg>
+                    <div class="circle-text"><span id="goal-percent">0</span>%</div>
+                </div>
+                <p id="goal-status-text">Target: 0h today</p>
+            </div>
+
+            <div class="card streak-card" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-icon orange"><i class="fas fa-fire"></i></div>
+                <h4>Study Streak</h4>
+                <h2 id="main-streak">0 Days</h2>
+                <p id="streak-msg">Keep the flame alive!</p>
+            </div>
+
+            <div class="card hours-card" data-aos="fade-up" data-aos-delay="200">
+                <div class="card-icon blue"><i class="fas fa-clock"></i></div>
+                <h4>Total Studied</h4>
+                <h2 id="total-hours">0h 0m</h2>
+                <p>All-time effort</p>
+            </div>
+        </div>
+
+        <section class="subject-section" data-aos="fade-up">
+            <div class="section-header">
+                <h3>Subject Completion</h3>
+                <a href="progress.html">View All</a>
+            </div>
+            <div class="subject-list" id="dynamic-subject-list">
+                <div class="sub-row">
+                    <span>Mathematics</span>
+                    <div class="bar-bg"><div id="math-bar" class="bar-fill" style="width: 0%; background: #2196f3;"></div></div>
+                    <span class="pct" id="math-pct">0%</span>
+                </div>
+                <div class="sub-row">
+                    <span>Use of English</span>
+                    <div class="bar-bg"><div id="eng-bar" class="bar-fill" style="width: 0%; background: #00C853;"></div></div>
+                    <span class="pct" id="eng-pct">0%</span>
+                </div>
+                <div class="sub-row">
+                    <span>Physics</span>
+                    <div class="bar-bg"><div id="phys-bar" class="bar-fill" style="width: 0%; background: #ff9800;"></div></div>
+                    <span class="pct" id="phys-pct">0%</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <button class="fab" onclick="window.location.href='subjects.html'">
+        <i class="fas fa-play"></i><span>Start Session</span>
+    </button>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+    <script>
+        AOS.init();
+        
+        window.addEventListener('DOMContentLoaded', () => {
+            const email = localStorage.getItem('currentUserEmail');
+            const userData = JSON.parse(localStorage.getItem(`user_${email}`));
+            const dailyGoalHrs = localStorage.getItem(`goal_${email}`) || 2;
+            const subjects = ['english', 'mathematics', 'physics', 'chemistry', 'biology', 'economics', 'government', 'literature'];
+
+            if (userData) {
+                document.getElementById('welcome-name').innerText = `Welcome back, ${userData.name || 'Frank'} 👋`;
+                document.getElementById('user-avatar').src = `https://ui-avatars.com/api/?name=${userData.name || 'Frank'}&background=00C853&color=fff`;
+                
+                let totalSeconds = 0;
+                subjects.forEach(sub => {
+                    const data = JSON.parse(localStorage.getItem(`study_${email}_${sub}`)) || { seconds: 0, progress: 0 };
+                    totalSeconds += data.seconds;
+                    updateSubjectBar(sub, data.progress);
+                });
+
+                // Update Hours
+                const h = Math.floor(totalSeconds / 3600);
+                const m = Math.floor((totalSeconds % 3600) / 60);
+                document.getElementById('total-hours').innerText = `${h}h ${m}m`;
+
+                // Update Circular Goal Progress
+                // (Note: To be 100% accurate, this should only count seconds from TODAY, but for this demo, it uses total hours vs daily goal)
+                const goalSeconds = dailyGoalHrs * 3600;
+                let goalPercent = Math.min(Math.round((totalSeconds / goalSeconds) * 100), 100);
+                
+                document.getElementById('goal-status-text').innerText = `Target: ${dailyGoalHrs}h / Progress: ${h}h`;
+                setTimeout(() => setProgressCircle(goalPercent), 500);
+
+                // Update Streak
+                const streak = userData.stats?.streak || 0;
+                document.getElementById('streak-val').innerText = streak;
+                document.getElementById('main-streak').innerText = `${streak} Days`;
+            }
+        });
+
+        function setProgressCircle(percent) {
+            const circle = document.getElementById('goal-circle');
+            const circumference = 50 * 2 * Math.PI;
+            const offset = circumference - (percent / 100 * circumference);
+            circle.style.strokeDashoffset = offset;
+            document.getElementById('goal-percent').innerText = percent;
+        }
+
+        function updateSubjectBar(subject, progress) {
+            const idMap = { 'mathematics': 'math', 'english': 'eng', 'physics': 'phys' };
+            const prefix = idMap[subject];
+            if (prefix) {
+                document.getElementById(`${prefix}-bar`).style.width = progress + '%';
+                document.getElementById(`${prefix}-pct`).innerText = progress + '%';
+            }
+        }
+
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString(undefined, options);
+
+        document.getElementById('hamburger').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('active');
+        });
+    </script>
+</body>
+</html>
